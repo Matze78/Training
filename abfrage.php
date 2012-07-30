@@ -20,8 +20,9 @@
 <h1>Abfrage</h1>
 
 <?php 
-//$script_name = $_SERVER['PHP_SELF'];
-$script_name = "#";
+$script_name = $_SERVER['PHP_SELF'];
+
+
 $start = 0; // Startwert setzen (0 = 1. Zeile)
 $step = 1; // Wie viele Einträge gleichzeitig?
 // Startwert verändern:
@@ -44,7 +45,9 @@ $result2 = mysqli_query($db, $sql2);
 for($i =0; $zeilen > $i; $i = $i + $step){
 $anf = $i +1;
 $end = $i + $step;
-echo "[<a href=\"abfrage2.php?start=$i\">$anf-$end</a>]";
+echo "[<a href=\"abfrage.php?start=$i\">$anf-$end</a>]";
+//echo "[<a href=".$script_name."?start=$i>$anf-$end</a>] ";
+
 }
 echo "<p>Anzahl der Einträge: $zeilen</p>\n";
 // while-Schleife Anfang
@@ -57,8 +60,8 @@ onClick='tipp_anzeigen1();' style='display:block'>";
 }
 
 
-
-echo "<div id='formular'><form action='$script_name' method='post'><p><textarea name='frage' rows='10' cols='70' autocomplete='off' />";
+//mögliches Problem: <form action='#'>
+echo "<div id='formular'><form action='#' method='post'><p><textarea name='frage' rows='10' cols='70' autocomplete='off' />";
 
 if (isset($_POST["frage"])){
 $convert1 = Array("<",">","\n","$");
