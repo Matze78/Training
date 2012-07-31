@@ -25,8 +25,8 @@ $Schwierigkeitsgrad = mysqli_real_escape_string($db, $_POST["Schwierigkeitsgrad"
 $Thema = mysqli_real_escape_string($db, $_POST["Thema"]);
 $Lektion = mysqli_real_escape_string($db, $_POST["Lektion"]);
 $Unterpunkt = mysqli_real_escape_string($db, $_POST["Unterpunkt"]);
-//$Lernstufe = mysqli_real_escape_string($db, $LS);
-//$Gedaechtnisstufe = mysqli_real_escape_string($db, $GS);
+$Lernstufe = mysqli_real_escape_string($db, $_POST["Lernstufe"]);
+$Gedaechtnisstufe = mysqli_real_escape_string($db, $_POST["Gedaechtnisstufe"]);
 $Thema = mysqli_real_escape_string($db, $_POST["Thema"]);
 $Lektion = mysqli_real_escape_string($db, $_POST["Lektion"]);
 $Unterpunkt = mysqli_real_escape_string($db, $_POST["Unterpunkt"]);
@@ -77,7 +77,7 @@ if($fehler){
 else {
 //Eintrag in die Datenbanktablle
 //$datum = date("d.m.Y, H:i"). " Uhr"; */
-$sqlbe = "UPDATE `trainer`.`kartei` SET Frage = '$Frage', Antwort = '$Antwort', Tipp ='$Tipp', Schwierigkeitsgrad ='$Schwierigkeitsgrad', Thema = '$Thema', Lektion = '$Lektion', Unterpunkt = '$Unterpunkt' WHERE id = ". $_POST["id"];
+$sqlbe = "UPDATE `trainer`.`kartei` SET Frage = '$Frage', Antwort = '$Antwort', Tipp ='$Tipp', Schwierigkeitsgrad ='$Schwierigkeitsgrad', Lernstufe = '$Lernstufe', Gedaechtnisstufe = '$Gedaechtnisstufe', Thema = '$Thema', Lektion = '$Lektion', Unterpunkt = '$Unterpunkt' WHERE id = ". $_POST["id"];
 
 //(`id`, `Frage`, `Antwort`, `Tipp`, `Schwierigkeitsgrad`, `Thema`, `Lektion`, `Unterpunkt`) SET('','$Frage','$Antwort', '$Tipp','$Schwierigkeitsgrad', '$Thema', '$Lektion', '$Unterpunkt')";
 mysqli_query($db, $sqlbe);
@@ -119,6 +119,13 @@ echo "Lektion:".
 
 echo "Unterpunkt:".
 "<input type='text' name='Unterpunkt' maxlength='40' value='".$dsatz["Unterpunkt"] ."' /><br />";
+
+echo "Lernstufe:".
+"<input type='text' name='Lernstufe' maxlength='1' value='".$dsatz["Lernstufe"] ."' /><br />";
+
+echo "Gedächtnisstufe:".
+"<input type='text' name='Gedaechtnisstufe' maxlength='1' value='".$dsatz["Gedaechtnisstufe"] ."' /><br />";
+
 
 echo "<input type='reset' value='Zurücksetzen' name='reset'>".
 "<input type='submit' value='Eintragen!' name='submit'><input type='hidden' name='id' value='".$dsatz["id"]."'></form>";

@@ -4,13 +4,30 @@
 <head> 
 <title>Abfrage</title>
 <meta charset="UTF-8">
-<script>function tipp_anzeigen1() 
-{document.getElementById("tipp").style.display='block';
+<script>
+function tipp_anzeigen1() {
+	document.getElementById("tipp").style.display='block';
 		if(document.getElementById("tipp").style.display =='block')
 		{
 		document.getElementById("button_tipp").style.display='none';
 		}
-}
+};
+
+
+function lernstufe(wert){
+	if (wert == 0){
+	document.Auswertung.Ergebnis.value = "nein";
+	}
+	if (wert == 1){
+	document.Auswertung.Ergebnis.value = "fast";
+	}
+	if (wert == 2){
+	document.Auswertung.Ergebnis.value = "ja";
+	}
+	
+document.Auswertung.submit();
+
+};
 </script>
 
 </head>
@@ -23,8 +40,10 @@
 $script_name = $_SERVER['PHP_SELF'];
 
 
+
+
 $start = 0; // Startwert setzen (0 = 1. Zeile)
-$step = 1; // Wie viele Einträge gleichzeitig?
+//$step = 1; // Wie viele Einträge gleichzeitig?
 // Startwert verändern:
 if (isset($_GET["start"])){
 $muster = "/^[0-9]+$/"; // regl. Ausdruck für Zahlen
@@ -38,7 +57,7 @@ $nr = $start +1;
 include("zugriff.inc.php");
 
 $sql1 = "SELECT * FROM kartei"; // SQL-Abfrage - Alles aus der Datei wird eingelesen
-$sql2 = "SELECT * FROM kartei ORDER BY id ASC LIMIT $start, $step";
+$sql2 = "SELECT * FROM kartei ORDER BY id ASC LIMIT $start"; //, $step";
 $result1 = mysqli_query($db, $sql1);
 $zeilen = mysqli_num_rows($result1);
 $result2 = mysqli_query($db, $sql2);
@@ -47,16 +66,23 @@ $anf = $i +1;
 $end = $i + $step;
 echo "[<a href=\"abfrage.php?start=$i\">$anf-$end</a>]";
 //echo "[<a href=".$script_name."?start=$i>$anf-$end</a>] ";
-
 }
+
+
 echo "<p>Anzahl der Einträge: $zeilen</p>\n";
+
+
+
+
+
+
+
 // while-Schleife Anfang
 while ($row = mysqli_fetch_assoc($result2)){
 echo"<div id='question'><p><h3>Frage Nr. $nr:</h3>"  . nl2br(htmlspecialchars($row["Frage"])) . "<p></div> ";
 if ($row["Tipp"]!=""){
 echo"<div id='tipp' style='display:none'><p>".$row["Tipp"]." </p></div>";
-echo"<input id='button_tipp' type='button' value='Tipp'
-onClick='tipp_anzeigen1();' style='display:block'>";
+echo"<input id='button_tipp' type='button' value='Tipp' onClick='tipp_anzeigen1();' style='display:block'>";
 }
 
 
@@ -70,15 +96,62 @@ $convert1 = Array("<",">","\n","$");
 		echo $output1;
 }
 
-echo "</textarea></p><p><input type='submit' value='Lösung anzeigen' /><input type='reset' /></p></form></div>";
-//hier soll eine "Datensatz bearbeiten Button" hin
+echo "</textarea></p>";
+//Anzeige der Lern- und Gedächtnisstufe
+echo "<p>Lernstufe: ".$row['Lernstufe']." Gedächtnisstufe: ".$row['Gedaechtnisstufe']."</p>";
+// Button: Lösung anzeigen / Zurücksetzen
+echo "<p><input type='submit' value='Lösung anzeigen' /><input type='reset' /></p></form></div>";
+
+
+//Datensatz bearbeiten button
 echo"<form action='bearbeiten.php' method='Post'><input type='hidden' name='id' value='".$row["id"]."'><input type='submit' name='bearbeiten' value='bearbeiten'/> </form>";
 
-
+//Anfang des Antwortdialoges
 if (isset($_POST["frage"])){
 	echo nl2br(htmlspecialchars($row["Antwort"]));
+	
+	// Ermittlung der Lern- und Gedächtnisstufe
 	echo "<p>War die Antwort richtig?</p>";
-}
+	
+	echo "<form name='Auswertung' action='abfrage.php' method='Post'>"; 
+	echo "<input name='Ergebnis' type='hidden' />";
+	echo "<input name='Zeile' type='hidden' value='".$row["id"]."'>";
+	echo "<input type='button' value='Nein' onclick='lernstufe(0)'/> <input type='button' value='Fast' onclick='lernstufe(1)' />"." <input type='button' value='Ja' onclick='lernstufe(2)' />";
+	
+	//Test - muss wieder gelöscht werden
+	echo "<input type='text' name='test' value=''>";
+	
+	echo "</form>";
+	
+
+	//PHP Auswertungsskript:
+
+if(isset($_POST["Ergebnis"]))	{ 
+	include("zugriff.inc.php");
+	$sql11="SELECT * FROM kartei WHERE id = ".$_POST["Zeile"];
+	$result1 = mysqli_query($db, $sql11);
+	$dsatz = mysqli_fetch_assoc($result1);
+
+	
+	if ($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 1) {
+		$sqlab = "UPDATE kartei SET Lernstufe = 2 WHERE id = ".$_POST["Zeile"];
+		}
+
+		
+		if (!empty($_GET["start"])) {
+			$next = $_GET["start"]+1;
+			echo"<p>nächster Eintrag: <a href=\"abfrage.php?start=$next\">nächste Frage</a></p>";
+			}
+	
+	}
+
+
+
+//Ende PHP Auswertungsskript
+	
+	
+	
+} // Ende Antwortdialog
 
 /*
 if (!empty($row["Antwort"])) {
@@ -90,6 +163,8 @@ echo "(".htmlspecialchars($row["Antwort"]) . ")";
 
 	
 } //while Ende
+
+
 
 
 mysqli_close($db);
