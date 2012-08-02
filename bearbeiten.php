@@ -11,8 +11,11 @@
 <div style="width: 600px">
 <h1>Fragen bearbeiten</h1>
 <?php 
+
+
 $script_name = $_SERVER['PHP_SELF'];
-echo'<form action="'.$script_name.'" method="post">';
+echo"<form action='$script_name' method='post'>";
+
 
 include("zugriff.inc.php");
 
@@ -30,7 +33,7 @@ $Gedaechtnisstufe = mysqli_real_escape_string($db, $_POST["Gedaechtnisstufe"]);
 $Thema = mysqli_real_escape_string($db, $_POST["Thema"]);
 $Lektion = mysqli_real_escape_string($db, $_POST["Lektion"]);
 $Unterpunkt = mysqli_real_escape_string($db, $_POST["Unterpunkt"]);
-// $Abfrage = mysqli_real_escape_string($db, 1);
+$Abfrage = mysqli_real_escape_string($db, $_POST["Abfrage"]);
 
 $fehler = false;
 $fehlertext ="";
@@ -66,6 +69,11 @@ $Lernstufe = 1;
 if (empty ($Gedaechtnisstufe)){
 $Gedaechtnisstufe = 1;
 }
+if (empty ($Abfrage)){
+$Abfrage = date('ymd', mktime(0, 0, 0, date("m")  , date("d"), date("Y")));
+}
+
+
 
 
 
@@ -77,7 +85,7 @@ if($fehler){
 else {
 //Eintrag in die Datenbanktablle
 //$datum = date("d.m.Y, H:i"). " Uhr"; */
-$sqlbe = "UPDATE `trainer`.`kartei` SET Frage = '$Frage', Antwort = '$Antwort', Tipp ='$Tipp', Schwierigkeitsgrad ='$Schwierigkeitsgrad', Lernstufe = '$Lernstufe', Gedaechtnisstufe = '$Gedaechtnisstufe', Thema = '$Thema', Lektion = '$Lektion', Unterpunkt = '$Unterpunkt' WHERE id = ". $_POST["id"];
+$sqlbe = "UPDATE `trainer`.`kartei` SET Frage = '$Frage', Antwort = '$Antwort', Tipp ='$Tipp', Schwierigkeitsgrad ='$Schwierigkeitsgrad', Lernstufe = '$Lernstufe', Gedaechtnisstufe = '$Gedaechtnisstufe', Thema = '$Thema', Lektion = '$Lektion', Unterpunkt = '$Unterpunkt', Abfrage = '$Abfrage' WHERE id = ". $_POST["id"];
 
 //(`id`, `Frage`, `Antwort`, `Tipp`, `Schwierigkeitsgrad`, `Thema`, `Lektion`, `Unterpunkt`) SET('','$Frage','$Antwort', '$Tipp','$Schwierigkeitsgrad', '$Thema', '$Lektion', '$Unterpunkt')";
 mysqli_query($db, $sqlbe);
@@ -126,10 +134,24 @@ echo "Lernstufe:".
 echo "Gedächtnisstufe:".
 "<input type='text' name='Gedaechtnisstufe' maxlength='1' value='".$dsatz["Gedaechtnisstufe"] ."' /><br />";
 
+echo "Datum der nächsten Abfrage:".
+"<input type='text' name='Abfrage' maxlength='8' value='".$dsatz["Abfrage"] ."' /><br />";
+
+
+if(isset($_POST['nr'])){
+$nr = $_POST['nr'];
+}else{
+$nr = 0;
+}
+echo"<input type='hidden' name='back' value='".$nr."' />";
 
 echo "<input type='reset' value='Zurücksetzen' name='reset'>".
 "<input type='submit' value='Eintragen!' name='submit'><input type='hidden' name='id' value='".$dsatz["id"]."'></form>";
 
+if (isset($_POST["back"])){
+echo "<a href='abfrage.php?start=".$_POST['back']."'>zurück</a>";
+
+}
 
 
 include("zugriff.inc.php");

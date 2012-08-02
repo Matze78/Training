@@ -43,7 +43,7 @@ $script_name = $_SERVER['PHP_SELF'];
 
 
 $start = 0; // Startwert setzen (0 = 1. Zeile)
-//$step = 1; // Wie viele Einträge gleichzeitig?
+$step = 1; // Wie viele Einträge gleichzeitig?
 // Startwert verändern:
 if (isset($_GET["start"])){
 $muster = "/^[0-9]+$/"; // regl. Ausdruck für Zahlen
@@ -57,7 +57,7 @@ $nr = $start +1;
 include("zugriff.inc.php");
 
 $sql1 = "SELECT * FROM kartei"; // SQL-Abfrage - Alles aus der Datei wird eingelesen
-$sql2 = "SELECT * FROM kartei ORDER BY id ASC LIMIT $start"; //, $step";
+$sql2 = "SELECT * FROM kartei ORDER BY id ASC LIMIT $start, $step";
 $result1 = mysqli_query($db, $sql1);
 $zeilen = mysqli_num_rows($result1);
 $result2 = mysqli_query($db, $sql2);
@@ -97,14 +97,18 @@ $convert1 = Array("<",">","\n","$");
 }
 
 echo "</textarea></p>";
-//Anzeige der Lern- und Gedächtnisstufe
-echo "<p>Lernstufe: ".$row['Lernstufe']." Gedächtnisstufe: ".$row['Gedaechtnisstufe']."</p>";
+//Anzeige der Lern- und Gedächtnisstufe und Datum der nächsten Abfrage
+echo "<p>Lernstufe: ".$row['Lernstufe']." Gedächtnisstufe: ".$row['Gedaechtnisstufe']. " nächstes Abfragedatum: ". $row['Abfrage'] ."</p>";
 // Button: Lösung anzeigen / Zurücksetzen
 echo "<p><input type='submit' value='Lösung anzeigen' /><input type='reset' /></p></form></div>";
 
 
 //Datensatz bearbeiten button
-echo"<form action='bearbeiten.php' method='Post'><input type='hidden' name='id' value='".$row["id"]."'><input type='submit' name='bearbeiten' value='bearbeiten'/> </form>";
+$back = 0;
+if(!empty($_GET["start"])){
+$back = $_GET["start"];
+}
+echo"<form action='bearbeiten.php' method='Post'><input type='hidden' name='id' value='".$row["id"]."'><input type='hidden' name='nr' value='".$back."' /><input type='submit' name='bearbeiten' value='bearbeiten'/> </form>";
 
 //Anfang des Antwortdialoges
 if (isset($_POST["frage"])){
@@ -112,9 +116,15 @@ if (isset($_POST["frage"])){
 	
 	// Ermittlung der Lern- und Gedächtnisstufe
 	echo "<p>War die Antwort richtig?</p>";
-	
-	echo "<form name='Auswertung' action='abfrage.php' method='Post'>"; 
-	echo "<input name='Ergebnis' type='hidden' />";
+
+	$next=0;
+	if (!empty($_GET["start"])) {
+			$next = $_GET["start"]+1;
+			}
+
+	echo "<form name='Auswertung' action='abfrage.php?start=$next' method='Post'>"; //was wird als nächstes gefragt? IDEE: Steuerung über If's und next
+//	echo "<form name='Auswertung' action='abfrage.php' method='post'>"; // Probetest zur Bugsuche, weil progress.php nicht funktioniert
+	echo "<input name='Ergebnis' type='hidden' value='' />";
 	echo "<input name='Zeile' type='hidden' value='".$row["id"]."'>";
 	echo "<input type='button' value='Nein' onclick='lernstufe(0)'/> <input type='button' value='Fast' onclick='lernstufe(1)' />"." <input type='button' value='Ja' onclick='lernstufe(2)' />";
 	
@@ -124,34 +134,38 @@ if (isset($_POST["frage"])){
 	echo "</form>";
 	
 
-	//PHP Auswertungsskript:
 
-if(isset($_POST["Ergebnis"]))	{ 
+
+/*{ 
 	include("zugriff.inc.php");
-	$sql11="SELECT * FROM kartei WHERE id = ".$_POST["Zeile"];
-	$result1 = mysqli_query($db, $sql11);
+	$sqlab1="SELECT * FROM kartei WHERE id = ".$_POST["Zeile"];
+	$result1 = mysqli_query($db, $sqlab1);
 	$dsatz = mysqli_fetch_assoc($result1);
-
+	echo"Test";
 	
-	if ($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 1) {
-		$sqlab = "UPDATE kartei SET Lernstufe = 2 WHERE id = ".$_POST["Zeile"];
-		}
+
+	if ($_POST["Ergebnis"] == "ja"){
+	$sqlab2 = "UPDATE kartei SET Lernstufe = 2 WHERE id = ".$_POST["Zeile"];
+		mysqli_query($db, $sqlab2);
+		echo"TEST";
+	} 
+	
+	
 
 		
-		if (!empty($_GET["start"])) {
-			$next = $_GET["start"]+1;
-			echo"<p>nächster Eintrag: <a href=\"abfrage.php?start=$next\">nächste Frage</a></p>";
-			}
 	
-	}
+	} */
+	
 
-
-
-//Ende PHP Auswertungsskript
+	
 	
 	
 	
 } // Ende Antwortdialog
+
+require("progress.php"); //PHP Auswertungsskript WICHTIG: Nicht in den Antwortdialog setzen!
+
+
 
 /*
 if (!empty($row["Antwort"])) {
