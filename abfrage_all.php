@@ -41,8 +41,6 @@ $fileName = $_SERVER['PHP_SELF'];
 $datum = date('ymd', mktime(0, 0, 0, date("m")  , date("d"), date("Y")))*1;
 
 
-
-
 $start = 0; // Startwert setzen (0 = 1. Zeile)
 $step = 1; // Wie viele Einträge gleichzeitig?
 // Startwert verändern:
@@ -61,23 +59,18 @@ $sql1 = "SELECT * FROM kartei"; // SQL-Abfrage - Alles aus der Datei wird eingel
 $sql2 = "SELECT * FROM kartei ORDER BY id ASC LIMIT $start, $step";
 $sql3 = "SELECT * FROM kartei WHERE Abfrage <= ". $datum ."";
 $sql4 = "SELECT * FROM kartei WHERE Abfrage <= ". $datum ." ORDER BY id ASC LIMIT $start, $step";
-$result1 = mysqli_query($db, $sql3);
+$result1 = mysqli_query($db, $sql1);
 $zeilen = mysqli_num_rows($result1);
-$result2 = mysqli_query($db, $sql4);
+$result2 = mysqli_query($db, $sql2);
 for($i =0; $zeilen > $i; $i = $i + $step){
 $anf = $i +1;
 $end = $i + $step;
-//echo "[<a href=\"abfrage.php?start=$i\">$anf-$end</a>]";
+
 echo "[<a href=".$fileName."?start=$i>$anf-$end</a>] ";
 }
 
 
 echo "<p>Anzahl der Einträge: $zeilen</p>\n";
-
-
-
-
-
 
 
 // while-Schleife Anfang
@@ -125,58 +118,17 @@ if (isset($_POST["frage"])){
 			$next = $_GET["start"]+1;
 			}
 
-	echo "<form name='Auswertung' action='abfrage.php?start=$next' method='Post'>"; //was wird als nächstes gefragt? IDEE: Steuerung über If's und next
-//	echo "<form name='Auswertung' action='abfrage.php' method='post'>"; // Probetest zur Bugsuche, weil progress.php nicht funktioniert
+	echo "<form name='Auswertung' action='".$fileName."?start=$next' method='Post'>"; //was wird als nächstes gefragt? IDEE: Steuerung über If's und next
 	echo "<input name='Ergebnis' type='hidden' value='' />";
 	echo "<input name='Zeile' type='hidden' value='".$row["id"]."'>";
 	echo "<input type='button' value='Nein' onclick='lernstufe(0)'/> <input type='button' value='Fast' onclick='lernstufe(1)' />"." <input type='button' value='Ja' onclick='lernstufe(2)' />";
-	
-	//Test - muss wieder gelöscht werden
-	echo "<input type='text' name='test' value=''>";
-	
 	echo "</form>";
-	
 
-
-
-/*{ 
-	include("zugriff.inc.php");
-	$sqlab1="SELECT * FROM kartei WHERE id = ".$_POST["Zeile"];
-	$result1 = mysqli_query($db, $sqlab1);
-	$dsatz = mysqli_fetch_assoc($result1);
-	echo"Test";
-	
-
-	if ($_POST["Ergebnis"] == "ja"){
-	$sqlab2 = "UPDATE kartei SET Lernstufe = 2 WHERE id = ".$_POST["Zeile"];
-		mysqli_query($db, $sqlab2);
-		echo"TEST";
-	} 
-	
-	
-
-		
-	
-	} */
-	
-
-	
-	
-	
-	
 } // Ende Antwortdialog
 
 require("progress.php"); //PHP Auswertungsskript WICHTIG: Nicht in den Antwortdialog setzen!
 
-
-
-/*
-if (!empty($row["Antwort"])) {
-echo "(".htmlspecialchars($row["Antwort"]) . ")";
-}
-*/
-	
-	$nr++;
+$nr++;
 
 	
 } //while Ende
