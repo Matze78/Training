@@ -37,6 +37,9 @@ document.Auswertung.submit();
 <h1>Abfrage</h1>
 
 <?php 
+error_reporting(E_ALL);  
+session_start(); 
+
 $fileName = $_SERVER['PHP_SELF'];
 $datum = date('ymd', mktime(0, 0, 0, date("m")  , date("d"), date("Y")))*1;
 
@@ -55,16 +58,19 @@ if (preg_match($muster, $_GET["start"]) == 0){
 $nr = $start +1;
 include("zugriff.inc.php");
 
-$sql1 = "SELECT * FROM kartei"; // SQL-Abfrage - Alles aus der Datei wird eingelesen
-$sql2 = "SELECT * FROM kartei ORDER BY id ASC LIMIT $start, $step";
-$sql3 = "SELECT * FROM kartei WHERE Abfrage <= ". $datum ."";
-$sql4 = "SELECT * FROM kartei WHERE Abfrage <= ". $datum ." ORDER BY id ASC LIMIT $start, $step";
+$sql1 = $_SESSION['abfrage1']; // SQL-Abfrage - Alles aus der Datei wird eingelesen
+
+$sql2 = $_SESSION['abfrage2'].$start. ", ". $step;
+
 $result1 = mysqli_query($db, $sql1);
+
 $zeilen = mysqli_num_rows($result1);
+
 $result2 = mysqli_query($db, $sql2);
 for($i =0; $zeilen > $i; $i = $i + $step){
 $anf = $i +1;
 $end = $i + $step;
+
 
 echo "[<a href=".$fileName."?start=$i>$anf-$end</a>] ";
 }
@@ -75,6 +81,8 @@ echo "<p>Anzahl der Einträge: $zeilen</p>\n";
 
 // while-Schleife Anfang
 while ($row = mysqli_fetch_assoc($result2)){
+//Anzeige des Themas
+echo"<p>Thema: ".$row['Thema']."</p>";
 echo"<div id='question'><p><h3>Frage Nr. $nr:</h3>"  . nl2br(htmlspecialchars($row["Frage"])) . "<p></div> ";
 if ($row["Tipp"]!=""){
 echo"<div id='tipp' style='display:none'><p>".$row["Tipp"]." </p></div>";
