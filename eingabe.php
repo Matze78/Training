@@ -58,6 +58,7 @@ include("zugriff.inc.php");
 
 $LS = 1;
 $GS = 1;
+$Datum =  date('ymd', mktime(0, 0, 0, date("m")  , date("d"), date("Y")));
 
 
 
@@ -75,7 +76,7 @@ $Gedaechtnisstufe = mysqli_real_escape_string($db, $GS);
 $Thema = mysqli_real_escape_string($db, $_POST["Thema"]);
 $Lektion = mysqli_real_escape_string($db, $_POST["Lektion"]);
 $Unterpunkt = mysqli_real_escape_string($db, $_POST["Unterpunkt"]);
-// $Abfrage = mysqli_real_escape_string($db, 1);
+$Abfrage = mysqli_real_escape_string($db, $Datum);
 
 $fehler = false;
 $fehlertext ="";
@@ -122,7 +123,7 @@ if($fehler){
 else {
 //Eintrag in die Datenbanktablle
 //$datum = date("d.m.Y, H:i"). " Uhr"; */
-$sql = "INSERT INTO `trainer`.`kartei` (`id`, `Frage`, `Antwort`, `Tipp`, `Schwierigkeitsgrad`, `Lernstufe`, `Gedaechtnisstufe`, `Thema`, `Lektion`, `Unterpunkt`) VALUES('','$Frage','$Antwort', '$Tipp','$Schwierigkeitsgrad', '$Lernstufe', '$Gedaechtnisstufe', '$Thema', '$Lektion', '$Unterpunkt')";
+$sql = "INSERT INTO `trainer`.`kartei` (`id`, `Frage`, `Antwort`, `Tipp`, `Schwierigkeitsgrad`, `Lernstufe`, `Gedaechtnisstufe`, `Thema`, `Lektion`, `Unterpunkt`, `Abfrage`) VALUES('','$Frage','$Antwort', '$Tipp','$Schwierigkeitsgrad', '$Lernstufe', '$Gedaechtnisstufe', '$Thema', '$Lektion', '$Unterpunkt', '$Abfrage')";
 mysqli_query($db, $sql);
 //Erfolgsanzeige
 if(mysqli_affected_rows($db) >0) {

@@ -8,6 +8,7 @@ if(isset($_POST["Auswahl"])){
 	if ($_POST["Auswahl"]== 1){
 	$_SESSION["abfrage1"] = 'SELECT * FROM kartei';
 	$_SESSION["abfrage2"]= 'SELECT * FROM kartei ORDER BY id ASC LIMIT ';
+	$_SESSION["Sprung"] = false;
 		header ("HTTP/1.1 301 Moved Permanently"); 
 	header ("Location: abfrage.php"); 
 	exit(); 
@@ -15,6 +16,7 @@ if(isset($_POST["Auswahl"])){
 	else if ($_POST["Auswahl"]== 2){
 	$_SESSION["abfrage1"] = 'SELECT * FROM kartei WHERE Abfrage <= '. $datum .'';
 	$_SESSION["abfrage2"] = 'SELECT * FROM kartei WHERE Abfrage <= '. $datum .' ORDER BY id ASC LIMIT ';
+	$_SESSION["Sprung"] = false;
 	header ("HTTP/1.1 301 Moved Permanently"); 
 	header ("Location: abfrage.php"); 
 	}

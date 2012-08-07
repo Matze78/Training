@@ -2,6 +2,7 @@
 //Skript zur Berechnung des Lernfortschritts//PHP Auswertungsskript:
 
 
+
 $newDate1 = date('ymd', mktime(0, 0, 0, date("m")  , date("d")+3, date("Y")));
 $newDate2 = date('ymd', mktime(0, 0, 0, date("m")  , date("d")+7, date("Y")));
 $newDate3 = date('ymd', mktime(0, 0, 0, date("m")  , date("d")+14, date("Y")));
@@ -22,48 +23,56 @@ if(isset($_POST["Ergebnis"]))	{
 	if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 1 && ($dsatz["Gedaechtnisstufe"] == 1 || $dsatz["Gedaechtnisstufe"] == 2 )) {
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 2 WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = false;
 		}
 //ja LS 2 GD 1 SG 1,2,3,4 -> LS 3	
-	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 2 && $dsatz["Gedaechtnisstufe"] == 1 )
-	{
+	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 2 && $dsatz["Gedaechtnisstufe"] == 1 ){
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 3  WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = false;
 		}
 // ja LS 3,  GD 1, SG 2,3,4 -> LS 4 GD 1
 	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 3 && $dsatz["Gedaechtnisstufe"] == 1 && $dsatz["Schwierigkeitsgrad"] != 1 ) {
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 4 WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = false;
 		}
 // ja LS 4,  GD 1, SG 3,4 -> LS 5 GD 1
 	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 4 && $dsatz["Gedaechtnisstufe"] == 1 && ($dsatz["Schwierigkeitsgrad"] == 3 || $dsatz["Schwierigkeitsgrad"] == 4 )) {
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 5 WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = false;
 		}
 // ja LS 5,  GD 1, SG 4 -> LS 6 GD 1
 	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 5 && $dsatz["Gedaechtnisstufe"] == 1 && $dsatz["Schwierigkeitsgrad"] == 4 ) {
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 6 WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = false;
 		}		
 //-- GS-Sprünge:		
 // ja LS 3,  GD 1, SG 1 -> LS 1 GD 2 nd 1
 	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 3 && $dsatz["Gedaechtnisstufe"] == 1 && $dsatz["Schwierigkeitsgrad"] == 1 ) {
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 2, Abfrage = ". $newDate1*1 ." WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = true;
 		}
 // ja LS 4,  GD 1, SG 2 -> LS 1 GD 2 nd1
 	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 4 && $dsatz["Gedaechtnisstufe"] == 1 && $dsatz["Schwierigkeitsgrad"] == 2 ) {
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 2, Abfrage = ". $newDate1*1 ." WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = true;
 		}
 // ja LS 5,  GD 1, SG 3 -> LS 1 GD 2 nd1
 	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 5 && $dsatz["Gedaechtnisstufe"] == 1 && $dsatz["Schwierigkeitsgrad"] == 3 ) {
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 2, Abfrage = ". $newDate1*1 ." WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = true;
 		} 
 // ja LS 6,  GD 1, SG 4 -> LS 1 GD 2 nd1
 	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 6 && $dsatz["Gedaechtnisstufe"] == 1 && $dsatz["Schwierigkeitsgrad"] == 4 ) {
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 2, Abfrage = ". $newDate1*1 ." WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = true;
 		}
 
 // Gedächtnisstufe 2
@@ -103,7 +112,7 @@ if(isset($_POST["Ergebnis"]))	{
 // ja LS 5,  GD 2, SG 4 -> LS 1 GD 3 nd1
 	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 5 && $dsatz["Gedaechtnisstufe"] == 2 && $dsatz["Schwierigkeitsgrad"] == 4 ) {
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 3, Abfrage = ". $newDate2*1 ." WHERE id = ".$_POST["Zeile"]; 
-		mysqli_query($db, $sqlab2);		
+		mysqli_query($db, $sqlab2);	
 		}
 // Gedächtnisstufe 3
 

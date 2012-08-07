@@ -4,6 +4,10 @@
 <head> 
 <title>Abfrage</title>
 <meta charset="UTF-8">
+
+<script type="text/javascript" src="js/shortcut.js"> </script> <!--JS für die Tastenkürzel -->
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+
 <script>
 function tipp_anzeigen1() {
 	document.getElementById("tipp").style.display='block';
@@ -28,13 +32,59 @@ function lernstufe(wert){
 document.Auswertung.submit();
 
 };
+
+shortcut.add("Tab",function() { //Lösung anzeigen
+	window.$('[accesskey=tab]').click();
+},{
+	'type':'keydown',
+	'propagate':true,
+	'target':document
+});
+
+shortcut.add("j",function() { //Antwort war richtig
+	window.$('[accesskey=j]').click();
+},{
+	'type':'keydown',
+	'disable_in_input':true,
+	'propagate':true,
+	'target':document
+});
+
+shortcut.add("f",function() { //Antwort war richtig
+	window.$('[accesskey=j]').click();
+},{
+	'type':'keydown',
+	'disable_in_input':true,
+	'propagate':true,
+	'target':document
+});
+
+shortcut.add("n",function() { //Antwort war richtig
+	window.$('[accesskey=j]').click();
+},{
+	'type':'keydown',
+	'disable_in_input':true,
+	'propagate':true,
+	'target':document
+});
+
 </script>
 
 </head>
+<?php // Abfrage, ob Fragebox in den Fokus soll
+if (empty($_POST["frage"])){
+echo "<body OnLoad='document.eingabe.frage.focus();'>"; 
+}
+else{
+echo "<body>";
+}
+?>
 
-<body>
 <div style="width: 600px">
 <h1>Abfrage</h1>
+<script>
+
+</script>
 
 <?php 
 error_reporting(E_ALL);  
@@ -52,7 +102,15 @@ $muster = "/^[0-9]+$/"; // regl. Ausdruck für Zahlen
 if (preg_match($muster, $_GET["start"]) == 0){
 	$start = 0; // Bei Manipulation Rückfall auf 0
 	} else {
-	$start = $_GET["start"];
+	 if ($_SESSION["Sprung"] == false){
+		$start = $_GET["start"];
+		} else {
+		$start = $_GET["start"]-1;
+			if ($start < 0) {
+			$start = 0;
+			}
+		
+		}
 	}
 }
 $nr = $start +1;
@@ -73,8 +131,8 @@ $end = $i + $step;
 
 
 echo "[<a href=".$fileName."?start=$i>$anf-$end</a>] ";
-}
 
+}
 
 echo "<p>Anzahl der Einträge: $zeilen</p>\n";
 
@@ -91,7 +149,7 @@ echo"<input id='button_tipp' type='button' value='Tipp' onClick='tipp_anzeigen1(
 
 
 //mögliches Problem: <form action='#'>
-echo "<div id='formular'><form action='#' method='post'><p><textarea name='frage' rows='10' cols='70' autocomplete='off' />";
+echo "<div id='formular'><form name='eingabe' action='#' method='post'><p><textarea name='frage' rows='10' cols='70' autocomplete='off' />";
 
 if (isset($_POST["frage"])){
 $convert1 = Array("<",">","\n","$");
@@ -104,7 +162,7 @@ echo "</textarea></p>";
 //Anzeige der Lern- und Gedächtnisstufe und Datum der nächsten Abfrage
 echo "<p>Lernstufe: ".$row['Lernstufe']." Gedächtnisstufe: ".$row['Gedaechtnisstufe']. " nächstes Abfragedatum: ". $row['Abfrage'] ."</p>";
 // Button: Lösung anzeigen / Zurücksetzen
-echo "<p><input type='submit' value='Lösung anzeigen' /><input type='reset' /></p></form></div>";
+echo "<p><input type='submit' value='Lösung anzeigen' accesskey='tab' /><input type='reset' /></p></form></div>";
 
 
 //Datensatz bearbeiten button
@@ -121,15 +179,18 @@ if (isset($_POST["frage"])){
 	// Ermittlung der Lern- und Gedächtnisstufe
 	echo "<p>War die Antwort richtig?</p>";
 
-	$next=0;
+	$next=1;
 	if (!empty($_GET["start"])) {
 			$next = $_GET["start"]+1;
+			if ($next == $zeilen){
+				$next = 0;
+				}
 			}
 
 	echo "<form name='Auswertung' action='".$fileName."?start=$next' method='Post'>"; //was wird als nächstes gefragt? IDEE: Steuerung über If's und next
 	echo "<input name='Ergebnis' type='hidden' value='' />";
 	echo "<input name='Zeile' type='hidden' value='".$row["id"]."'>";
-	echo "<input type='button' value='Nein' onclick='lernstufe(0)'/> <input type='button' value='Fast' onclick='lernstufe(1)' />"." <input type='button' value='Ja' onclick='lernstufe(2)' />";
+	echo "<input type='button' value='Nein' onclick='lernstufe(0)' accesskey='n' /> <input type='button' value='Fast' onclick='lernstufe(1)' accesskey='f'/>"." <input type='button' value='Ja' onclick='lernstufe(2)' accesskey='j' />";
 	echo "</form>";
 
 } // Ende Antwortdialog
