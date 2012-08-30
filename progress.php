@@ -1,7 +1,7 @@
 ﻿<?php
 //Skript zur Berechnung des Lernfortschritts//PHP Auswertungsskript:
 
-
+$datum = date('ymd', mktime(0, 0, 0, date("m")  , date("d"), date("Y")))*1;
 
 $newDate1 = date('ymd', mktime(0, 0, 0, date("m")  , date("d")+3, date("Y")));
 $newDate2 = date('ymd', mktime(0, 0, 0, date("m")  , date("d")+7, date("Y")));
@@ -10,17 +10,26 @@ $newDate4 = date('ymd', mktime(0, 0, 0, date("m")  , date("d")+21, date("Y")));
 $newDate5 = date('ymd', mktime(0, 0, 0, date("m")  , date("d")+40, date("Y")));
 
 
+
 if(isset($_POST["Ergebnis"]))	{ 
 	include("zugriff.inc.php");
 	$sqlab1="SELECT * FROM kartei WHERE id = ".$_POST["Zeile"];
 	$result1 = mysqli_query($db, $sqlab1);
 	$dsatz = mysqli_fetch_assoc($result1);
+//Prüfen, ob Datum kleiner gleich aktuelles Datum - Datum Bedingung
+if ($datum >= $dsatz["Abfrage"]){
+	
+//if fast
+	if ($_POST["Ergebnis"] == "fast"){
+	$_SESSION["Sprung"] = false;
+	}
 
+	
 // if ja	
 // Gedächtnisstufe 1
 
 // ja LS 1 GD 1,2 SG 1,2,3,4 -> LS 2
-	if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 1 && ($dsatz["Gedaechtnisstufe"] == 1 || $dsatz["Gedaechtnisstufe"] == 2 )) {
+	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 1 && ($dsatz["Gedaechtnisstufe"] == 1 || $dsatz["Gedaechtnisstufe"] == 2 )) {
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 2 WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
 		$_SESSION["Sprung"] = false;
@@ -205,7 +214,7 @@ if(isset($_POST["Ergebnis"]))	{
 // Gedächtnisstufe 6		
 // ja LS 1,  GD 6, SG 1, 2, 3, 4 -> GD 7
 	else if($_POST["Ergebnis"] == "ja" && $dsatz["Lernstufe"] == 1 && $dsatz["Gedaechtnisstufe"] == 6){
-		$sqlab2 = "UPDATE kartei SET Gedaechtnisstufe = 7 WHERE id = ".$_POST["Zeile"]; 
+		$sqlab2 = "UPDATE kartei SET Gedaechtnisstufe = 7, Status = 3 WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
 		}
 
@@ -274,9 +283,58 @@ if(isset($_POST["Ergebnis"]))	{
 		$sqlab2 = "UPDATE kartei SET Lernstufe = 1 WHERE id = ".$_POST["Zeile"]; 
 		mysqli_query($db, $sqlab2);
 		}
-	
-	} //Ende der if - isset Bedingung
 
+//"gelernt" Sprünge
+//GD1 -> GD2, LS1, nd1
+		
+		else if($_POST["Ergebnis"] == "gelernt" && $dsatz["Gedaechtnisstufe"] == 1 ) {
+		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 2, Abfrage = ". $newDate1*1 ." WHERE id = ".$_POST["Zeile"]; 
+		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = true;
+		}
+		
+//GD2 -> GD3, LS1, nd2
+		
+		else if($_POST["Ergebnis"] == "gelernt" && $dsatz["Gedaechtnisstufe"] == 2 ) {
+		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 3, Abfrage = ". $newDate2*1 ." WHERE id = ".$_POST["Zeile"]; 
+		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = true;
+		}
+
+//GD3 -> GD4, LS1, nd3
+		
+		else if($_POST["Ergebnis"] == "gelernt" && $dsatz["Gedaechtnisstufe"] == 3 ) {
+		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 4, Abfrage = ". $newDate3*1 ." WHERE id = ".$_POST["Zeile"]; 
+		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = true;
+		}
+
+//GD4 -> GD5, LS1, nd4
+		
+		else if($_POST["Ergebnis"] == "gelernt" && $dsatz["Gedaechtnisstufe"] == 4 ) {
+		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 5, Abfrage = ". $newDate4*1 ." WHERE id = ".$_POST["Zeile"]; 
+		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = true;
+		}
+		
+//GD5 -> GD6, LS1, nd5
+		
+		else if($_POST["Ergebnis"] == "gelernt" && $dsatz["Gedaechtnisstufe"] ==5 ) {
+		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 6, Abfrage = ". $newDate5*1 ." WHERE id = ".$_POST["Zeile"]; 
+		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = true;
+		}
+		
+//GD6 -> GD7
+		
+		else if($_POST["Ergebnis"] == "gelernt" && $dsatz["Gedaechtnisstufe"] ==6 ) {
+		$sqlab2 = "UPDATE kartei SET Lernstufe = 1, Gedaechtnisstufe = 7, Status = 3 WHERE id = ".$_POST["Zeile"]; 
+		mysqli_query($db, $sqlab2);
+		$_SESSION["Sprung"] = true;
+		}
+	} //Ende der Datum - Bedingung	
+		
+	} //Ende der if - isset Bedingung
 
 
 

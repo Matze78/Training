@@ -1,0 +1,68 @@
+﻿#navbar {
+	border:none;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	height:auto;
+	width: 100%;
+	background-color: #000000;
+
+}
+
+#navwrapper{
+  position: relative;
+  left: 30px;
+}
+
+ul {
+  font-family: Arial, Verdana;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0;
+  padding: 0; 
+  display:inline;
+  list-style: none; /* keine Kuller*/
+
+  
+}
+ul li {
+ float: left;
+  display: block;
+  /*display: inline-block;*/
+position: relative;
+
+
+
+}
+
+li ul { display: none; 
+left: 0px;
+}
+ul li a {
+  display: block;
+  text-decoration: none;
+  color: #cccccc;
+  padding: 5px 15px 5px 15px;
+  background: #000000;
+
+  white-space: nowrap;
+}
+ul li a:hover { background: #303030;  /*Hover Menü*/
+color:#ffffff;
+
+}
+li:hover ul {
+  display: block;
+  position: absolute;
+  background: #303030;
+}
+li:hover li {
+  float: none;
+  font-size: 12px;
+  background: #303030;
+}
+li:hover li a:hover { background: #606060; /*Hoverfläche Untermenü*/
+color: #ffffff; }
+li:hover a { background: #303030; }
+
+*/
